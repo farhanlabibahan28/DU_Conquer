@@ -347,25 +347,25 @@
   <image source="../Tiles Image/separated images/tile_114.png" width="32" height="32"/>
  </tile>
  <tile id="115">
-  <image source="../../../Downloads/stone.png" width="73" height="64"/>
+  <image source="../Tiles Image/stone.png" width="73" height="64"/>
  </tile>
  <tile id="116">
-  <image source="../../../Downloads/tiled (1).png" width="69" height="64"/>
+  <image source="../Tiles Image/tiled (1).png" width="69" height="64"/>
  </tile>
  <tile id="117">
-  <image source="../../../Downloads/tiled (2).png" width="64" height="59"/>
+  <image source="../Tiles Image/tiled (2).png" width="64" height="59"/>
  </tile>
  <tile id="118">
-  <image source="../../../Downloads/tiled_.png" width="64" height="59"/>
+  <image source="../Tiles Image/tiled_.png" width="64" height="59"/>
  </tile>
  <tile id="119">
-  <image source="../../../Downloads/tiled_flower.png" width="69" height="64"/>
+  <image source="../Tiles Image/tiled_flower.png" width="69" height="64"/>
  </tile>
  <tile id="120">
-  <image source="../../../Downloads/tiled_test.png" width="64" height="59"/>
+  <image source="../Tiles Image/tiled_test.png" width="64" height="59"/>
  </tile>
  <tile id="121">
-  <image source="../../../Downloads/tiled_tree.png" width="69" height="64"/>
+  <image source="../Tiles Image/tiled_tree.png" width="69" height="64"/>
  </tile>
  <tile id="122">
   <image source="../Tiles Image/tiled_wall_test.png" width="91" height="64"/>
