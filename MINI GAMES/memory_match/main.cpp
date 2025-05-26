@@ -6,9 +6,9 @@
 
 #define MAX_PAIRS 8
 #define MAX_CARDS (MAX_PAIRS * 2)
-#define CARD_WIDTH 140
-#define CARD_HEIGHT 100
-#define PADDING 25
+#define CARD_WIDTH 180
+#define CARD_HEIGHT 120
+#define PADDING 30
 #define ROWS 4
 #define COLUMNS 4
 #define FLIP_TIME 0.3f
@@ -36,14 +36,7 @@ float gameTime = 60.0f; // 60 seconds timer
 bool gameOver = false;
 Rectangle restartButton = {350, 560, 150, 30};
 
-Color RandomColor() {
-    return (Color){
-        (unsigned char)GetRandomValue(100, 255),
-        (unsigned char)GetRandomValue(100, 255),
-        (unsigned char)GetRandomValue(100, 255),
-        255
-    };
-}
+Color cardColor = (Color){200, 230, 255, 255};
 
 void Shuffle(char labels[MAX_CARDS][32]) {
     for (int i = MAX_CARDS - 1; i > 0; i--) {
@@ -138,23 +131,24 @@ void UpdateGame(float delta) {
 }
 
 void DrawCard(Card *card, Font font) {
-    Color color = card->matched ? GRAY : RandomColor();
-    DrawRectangleRec(card->rect, card->revealed || card->matched ? color : DARKGRAY);
+    Color borderColor = BLACK;
+    DrawRectangleRec(card->rect, card->revealed || card->matched ? cardColor : DARKGRAY);
+    DrawRectangleLinesEx(card->rect, 2, borderColor);
     if (card->revealed || card->matched) {
-        Vector2 textSize = MeasureTextEx(font, card->label, 18, 1);
+        Vector2 textSize = MeasureTextEx(font, card->label, 24, 2);
         DrawTextEx(font, card->label,
             (Vector2){card->rect.x + (CARD_WIDTH - textSize.x)/2, card->rect.y + (CARD_HEIGHT - textSize.y)/2},
-            18, 1, BLACK);
+            24, 2, BLACK);
     }
 }
 
 int main(void) {
-    InitWindow(850, 600, "Memory Match Game - Spirit Animals");
+    InitWindow(900, 700, "Memory Match Game - Spirit Animals");
     InitAudioDevice();
     SetTargetFPS(60);
     srand(time(NULL));
 
-    Font font = LoadFont("resources/arial.ttf");
+    Font font = LoadFont("resources/Roboto-Bold.ttf");
     if (!font.texture.id) font = GetFontDefault();
 
     InitCards();
@@ -191,15 +185,15 @@ int main(void) {
 
         char timerText[64];
         snprintf(timerText, sizeof(timerText), "Time Left: %.1f", gameTime);
-        DrawTextEx(font, timerText, (Vector2){630, 20}, 20, 2, RED);
+        DrawTextEx(font, timerText, (Vector2){680, 20}, 22, 2, RED);
 
         if (gameOver) {
             const char* resultText = (matchedCount == MAX_PAIRS) ? "YOU WIN LESGOO!" : "WHARRA MEMORY HAHA";
-            Vector2 size = MeasureTextEx(font, resultText, 36, 2);
-            DrawTextEx(font, resultText, (Vector2){(850 - size.x)/2, 500}, 36, 2, BLUE);
+            Vector2 size = MeasureTextEx(font, resultText, 38, 2);
+            DrawTextEx(font, resultText, (Vector2){(900 - size.x)/2, 600}, 38, 2, BLUE);
 
             DrawRectangleRec(restartButton, LIGHTGRAY);
-            DrawTextEx(font, "RESTART", (Vector2){restartButton.x + 20, restartButton.y + 5}, 20, 2, BLACK);
+            DrawTextEx(font, "RESTART", (Vector2){restartButton.x + 20, restartButton.y + 5}, 22, 2, BLACK);
         }
 
         EndDrawing();
