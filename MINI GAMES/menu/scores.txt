@@ -1,0 +1,5 @@
+Raima 1000
+Raisa 850
+Salwa 750
+Ahan 150
+AHK 0
