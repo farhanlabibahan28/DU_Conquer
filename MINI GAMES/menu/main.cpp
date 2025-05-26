@@ -27,15 +27,15 @@ public:
     }
 
     void DrawButton(int fontSize, Color bgColor) const {
-    DrawRectangleRec(bounds, bgColor);
-    Color currentTextColor = IsHovered() ? textColorHover : textColorNormal;
-    int textWidth = MeasureText(label, fontSize);
-    DrawText(label,
-             bounds.x + (bounds.width - textWidth) / 2,
-             bounds.y + (bounds.height - fontSize) / 2,
-             fontSize,
-             currentTextColor);
-}
+        DrawRectangleRec(bounds, bgColor);
+        Color currentTextColor = IsHovered() ? textColorHover : textColorNormal;
+        int textWidth = MeasureText(label, fontSize);
+        DrawText(label,
+                 bounds.x + (bounds.width - textWidth) / 2,
+                 bounds.y + (bounds.height - fontSize) / 2,
+                 fontSize,
+                 currentTextColor);
+    }
 };
 
 int main() {
@@ -63,7 +63,14 @@ int main() {
     SetTargetFPS(144);
 
     while (!WindowShouldClose()) {
-        // Handle clicks
+        // Dialog Box setup
+        int boxWidth = 500;
+        int boxHeight = 300;
+        int x = screenWidth / 2 - boxWidth / 2 + 100;
+        int y = screenHeight / 2 - boxHeight / 2 + 200;
+        Rectangle closeBtn = { x + boxWidth - 35, y + 10, 25, 25 };
+
+        // Mouse Clicks
         if (btnNew.IsClicked()) {
             clickedMessage = "New Game clicked!";
         }
@@ -90,6 +97,14 @@ int main() {
             return 0;
         }
 
+        // Box Close
+        if (high_score_b &&
+            IsMouseButtonPressed(MOUSE_LEFT_BUTTON) &&
+            CheckCollisionPointRec(GetMousePosition(), closeBtn)) {
+            high_score_b = false;
+            clickedMessage = nullptr;
+        }
+
         // Drawing
         BeginDrawing();
         ClearBackground(BLACK);
@@ -107,13 +122,13 @@ int main() {
         btnExit.DrawButton(fontSize, blackTransparent);
 
         if (high_score_b) {
-            int boxWidth = 500;
-            int boxHeight = 300;
-            int x = screenWidth / 2 - boxWidth / 2 + 100;
-            int y = screenHeight / 2 - boxHeight / 2 + 200;
-
             DrawRectangleRounded((Rectangle){x, y, boxWidth, boxHeight}, 0.3f, 10, Fade(BLACK, 0.75f));
 
+            // Close Button Button Draw
+            DrawRectangleRec(closeBtn, RED);
+            DrawText("Quit", closeBtn.x + 6, closeBtn.y + 2, 20, WHITE);
+
+            // Load and draw scores
             vector<pair<string, int>> scores;
             ifstream file("scores.txt");
             string name; int score;
@@ -121,29 +136,17 @@ int main() {
             while (file >> name >> score)
                 scores.emplace_back(name, score);
 
-            int yp = y +80;
-            for(auto it:scores)
-            {
-                if(it.second>=1000) 
-                {
-                    string toShow = it.first + "    "+to_string(it.second) + "  (DU Conqured)";
-                    DrawText(toShow.c_str(), x + 20, yp, 20, GREEN);
-                }
-                else if(it.second<1000 && it.second>0) 
-                {
-                    string toShow = it.first + "    "+to_string(it.second);
-                    DrawText(toShow.c_str(), x + 20, yp, 20, ORANGE);
-                }
-                else if(it.second==0) 
-                {
-                    string toShow = it.first + "    "+to_string(it.second)+"  (Failed)";
-                    DrawText(toShow.c_str(), x + 20, yp, 20, WHITE);
-                }
-                yp+=30;
+            int yp = y + 80;
+            for (auto& it : scores) {
+                string toShow = it.first + "    " + to_string(it.second);
+                if (it.second >= 1000) toShow += "  (DU Conqured)";
+                else if (it.second == 0) toShow += "  (Failed)";
+
+                Color col = (it.second >= 1000) ? GREEN : (it.second == 0 ? WHITE : ORANGE);
+                DrawText(toShow.c_str(), x + 20, yp, 20, col);
+                yp += 30;
             }
 
-                    
-    
             DrawText(clickedMessage, x + 20, y + 40, 20, RED);
         }
 

@@ -1,4 +1,6 @@
-#include <SFML/Graphics.hpp>
+#include "raylib.h"
+#include <string>
+#include <array>
 #include <iostream>
 
 const int WINDOW_SIZE = 600;
@@ -7,103 +9,86 @@ const int CELL_SIZE = WINDOW_SIZE / 3;
 enum class GameState { EnteringNames, Playing, GameOver };
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE), "Tic Tac Toe - vs Bot");
+    InitWindow(WINDOW_SIZE, WINDOW_SIZE, "Tic Tac Toe - vs Bot");
+    SetTargetFPS(60);
 
-    // Load font
-    sf::Font font;
-    if (!font.loadFromFile("arial.ttf")) {
-        std::cerr << "Font load failed.\n";
-        return 1;
-    }
-
-    // Game state variables
     GameState gameState = GameState::EnteringNames;
-    std::string playerName = "", botName = "Bot";
-    bool enteringName = true;
+    std::string playerName = "";
+    std::string botName = "Bot";
     bool xTurn = true;  // Player is X
-    std::string board[3][3] = { "" };
+    std::array<std::array<std::string, 3>, 3> board = { "" };
     std::string winner = "";
 
-    // UI Elements
-    sf::Text namePrompt("Enter Your Name:", font, 28);
-    namePrompt.setFillColor(sf::Color::White);
-    namePrompt.setPosition(50, 100);
+    // Input related
+    bool enteringName = true;
+    int nameCursorBlinkTimer = 0;
+    const int blinkDelay = 30;
 
-    sf::Text nameInput("", font, 28);
-    nameInput.setFillColor(sf::Color::Yellow);
-    nameInput.setPosition(50, 160);
+    // Load default font (raylib default)
+    Font font = GetFontDefault();
 
-    sf::Text statusText("", font, 24);
-    statusText.setFillColor(sf::Color::White);
-    statusText.setPosition(10, 10);
+    // Status text position
+    Vector2 statusPos = { 10, 10 };
 
-    sf::RectangleShape restartButton(sf::Vector2f(200, 50));
-    restartButton.setFillColor(sf::Color(100, 200, 100));
-    restartButton.setPosition(WINDOW_SIZE / 2 - 100, WINDOW_SIZE - 70);
+    // Restart button
+    Rectangle restartButton = { WINDOW_SIZE / 2 - 100, WINDOW_SIZE - 70, 200, 50 };
 
-    sf::Text restartText("Restart", font, 24);
-    restartText.setFillColor(sf::Color::Black);
-    restartText.setPosition(restartButton.getPosition().x + 50, restartButton.getPosition().y + 10);
-
-    auto checkWin = [&](const std::string& symbol) -> bool {
+    auto checkWin = [&]() -> bool {
         for (int i = 0; i < 3; ++i) {
-            if ((board[i][0] == symbol && board[i][1] == symbol && board[i][2] == symbol) ||
-                (board[0][i] == symbol && board[1][i] == symbol && board[2][i] == symbol))
+            if ((board[i][0] == board[i][1] && board[i][1] == board[i][2] && !board[i][0].empty()) ||
+                (board[0][i] == board[1][i] && board[1][i] == board[2][i] && !board[0][i].empty()))
                 return true;
         }
-        return (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol) ||
-               (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol);
+        return (!board[0][0].empty() && board[0][0] == board[1][1] && board[1][1] == board[2][2]) ||
+               (!board[0][2].empty() && board[0][2] == board[1][1] && board[1][1] == board[2][0]);
     };
 
     auto boardFull = [&]() -> bool {
-        for (auto& row : board)
-            for (auto& cell : row)
-                if (cell == "") return false;
+        for (auto &row : board)
+            for (auto &cell : row)
+                if (cell.empty()) return false;
         return true;
     };
 
     auto botMove = [&]() {
         for (int r = 0; r < 3; ++r)
             for (int c = 0; c < 3; ++c)
-                if (board[r][c] == "") {
+                if (board[r][c].empty()) {
                     board[r][c] = "O";
                     return;
                 }
     };
 
     auto resetGame = [&]() {
-        for (auto& row : board)
-            for (auto& cell : row)
-                cell = "";
+        for (auto &row : board)
+            for (auto &cell : row)
+                cell.clear();
         gameState = GameState::Playing;
         xTurn = true;
-        winner = "";
+        winner.clear();
     };
 
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-
-            if (gameState == GameState::EnteringNames && event.type == sf::Event::TextEntered) {
-                if (event.text.unicode == '\b') {
-                    if (!playerName.empty()) playerName.pop_back();
-                } else if (event.text.unicode == '\r') {
-                    gameState = GameState::Playing;
-                } else if (event.text.unicode < 128) {
-                    playerName.push_back(static_cast<char>(event.text.unicode));
+    while (!WindowShouldClose()) {
+        // Input handling
+        if (gameState == GameState::EnteringNames) {
+            int key = GetKeyPressed();
+            if (key > 0 && playerName.size() < 20) {
+                if (key == KEY_BACKSPACE && !playerName.empty()) {
+                    playerName.pop_back();
+                } else if (key >= 32 && key < 128) { // printable ASCII
+                    playerName.push_back((char)key);
                 }
-                nameInput.setString(playerName);
             }
-
-            if (gameState == GameState::Playing && event.type == sf::Event::MouseButtonPressed) {
-                int col = event.mouseButton.x / CELL_SIZE;
-                int row = event.mouseButton.y / CELL_SIZE;
-
-                if (row < 3 && col < 3 && board[row][col] == "" && xTurn) {
+            if (IsKeyPressed(KEY_ENTER) && !playerName.empty()) {
+                gameState = GameState::Playing;
+            }
+        } else if (gameState == GameState::Playing) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && xTurn) {
+                int col = GetMouseX() / CELL_SIZE;
+                int row = GetMouseY() / CELL_SIZE;
+                if (row < 3 && col < 3 && board[row][col].empty()) {
                     board[row][col] = "X";
-                    if (checkWin("X")) {
+                    if (checkWin()) {
                         winner = playerName;
                         gameState = GameState::GameOver;
                     } else if (boardFull()) {
@@ -112,7 +97,7 @@ int main() {
                     } else {
                         xTurn = false;
                         botMove();
-                        if (checkWin("O")) {
+                        if (checkWin()) {
                             winner = botName;
                             gameState = GameState::GameOver;
                         } else if (boardFull()) {
@@ -124,67 +109,64 @@ int main() {
                     }
                 }
             }
-
-            if (gameState == GameState::GameOver && event.type == sf::Event::MouseButtonPressed) {
-                if (restartButton.getGlobalBounds().contains(event.mouseButton.x, event.mouseButton.y)) {
+        } else if (gameState == GameState::GameOver) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                Vector2 mousePoint = { (float)GetMouseX(), (float)GetMouseY() };
+                if (CheckCollisionPointRec(mousePoint, restartButton)) {
                     resetGame();
                 }
             }
         }
 
-        // Draw
-        window.clear(sf::Color(40, 44, 52));  // dark background
+        // Drawing
+        BeginDrawing();
+        ClearBackground((Color){40, 44, 52, 255}); // dark background
 
         if (gameState == GameState::EnteringNames) {
-            window.draw(namePrompt);
-            window.draw(nameInput);
+            DrawText("Enter Your Name:", 50, 100, 28, WHITE);
+            std::string displayName = playerName;
+            // blinking cursor
+            if ((GetFrameTime() * 60) - (int)(GetFrameTime() * 60) < 0.5f)
+                displayName += "_";
+            DrawText(displayName.c_str(), 50, 160, 28, YELLOW);
         } else {
-            // Draw grid
+            // Draw grid lines
             for (int i = 1; i < 3; ++i) {
-                sf::RectangleShape lineH(sf::Vector2f(WINDOW_SIZE, 4));
-                lineH.setPosition(0, i * CELL_SIZE);
-                lineH.setFillColor(sf::Color(180, 180, 180));
-                window.draw(lineH);
-
-                sf::RectangleShape lineV(sf::Vector2f(4, WINDOW_SIZE));
-                lineV.setPosition(i * CELL_SIZE, 0);
-                lineV.setFillColor(sf::Color(180, 180, 180));
-                window.draw(lineV);
+                DrawRectangle(0, i * CELL_SIZE, WINDOW_SIZE, 4, (Color){180, 180, 180, 255});
+                DrawRectangle(i * CELL_SIZE, 0, 4, WINDOW_SIZE, (Color){180, 180, 180, 255});
             }
 
             // Draw X and O
-            sf::Text cellText("", font, 100);
             for (int r = 0; r < 3; ++r) {
                 for (int c = 0; c < 3; ++c) {
-                    if (board[r][c] != "") {
-                        cellText.setString(board[r][c]);
-                        cellText.setFillColor(board[r][c] == "X" ? sf::Color::Red : sf::Color::Cyan);
-                        cellText.setPosition(c * CELL_SIZE + 55, r * CELL_SIZE + 25);
-                        window.draw(cellText);
+                    if (!board[r][c].empty()) {
+                        Color col = board[r][c] == "X" ? RED : SKYBLUE;
+                        int offsetX = 55;
+                        int offsetY = 25;
+                        DrawText(board[r][c].c_str(), c * CELL_SIZE + offsetX, r * CELL_SIZE + offsetY, 100, col);
                     }
                 }
             }
 
-            // Status text
+            // Draw status text
             if (gameState == GameState::GameOver) {
                 if (winner == "Draw")
-                    statusText.setString("It's a Draw!");
+                    DrawText("It's a Draw!", statusPos.x, statusPos.y, 24, WHITE);
                 else
-                    statusText.setString(winner + " Wins!");
-                window.draw(statusText);
+                    DrawText((winner + " Wins!").c_str(), statusPos.x, statusPos.y, 24, WHITE);
 
-                // Draw Restart
-                window.draw(restartButton);
-                window.draw(restartText);
+                // Draw restart button
+                DrawRectangleRec(restartButton, (Color){100, 200, 100, 255});
+                DrawText("Restart", restartButton.x + 50, restartButton.y + 10, 24, BLACK);
             } else {
                 std::string turn = xTurn ? playerName : botName;
-                statusText.setString(turn + "'s Turn (" + (xTurn ? "X" : "O") + ")");
-                window.draw(statusText);
+                DrawText((turn + "'s Turn (" + (xTurn ? "X" : "O") + ")").c_str(), statusPos.x, statusPos.y, 24, WHITE);
             }
         }
 
-        window.display();
+        EndDrawing();
     }
 
+    CloseWindow();
     return 0;
 }
