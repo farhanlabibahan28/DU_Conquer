@@ -128,8 +128,40 @@ int main(void) {
             DrawTile(tiles[i], x, y, fullImage);
         }
 
-        DrawText(TextFormat("Moves: %d", moveCount), 10, WINDOW_HEIGHT - 40, 20, DARKGRAY);
-        DrawText("Press S to shuffle", WINDOW_WIDTH - 180, WINDOW_HEIGHT - 40, 20, DARKGRAY);
+        int fontSize = 20;
+        const char *buttonText = TextFormat("Moves: %d", moveCount);
+        const char *buttonHighScore = "High Score";
+        const char *buttonHelp = "Help";
+        const char *buttonExit = "Exit";
+
+        int textWidthNewGame = MeasureText(buttonText, fontSize);
+        int textWidthHighScore = MeasureText(buttonHighScore, fontSize);
+        int textWidthHelp = MeasureText(buttonHelp, fontSize);
+        int textWidthExit = MeasureText(buttonExit, fontSize);
+
+        DrawText(buttonText,
+                 10 + (100 - textWidthNewGame) / 2,
+                 WINDOW_HEIGHT - 40 + (30 - fontSize) / 2,
+                 fontSize,
+                 DARKGRAY);
+
+        DrawText(buttonHighScore,
+                 120 + (100 - textWidthHighScore) / 2,
+                 WINDOW_HEIGHT - 40 + (30 - fontSize) / 2,
+                 fontSize,
+                 DARKGRAY);
+
+        DrawText(buttonHelp,
+                 230 + (100 - textWidthHelp) / 2,
+                 WINDOW_HEIGHT - 40 + (30 - fontSize) / 2,
+                 fontSize,
+                 DARKGRAY);
+
+        DrawText(buttonExit,
+                 WINDOW_WIDTH - 100 + (100 - textWidthExit) / 2,
+                 WINDOW_HEIGHT - 40 + (30 - fontSize) / 2,
+                 fontSize,
+                 DARKGRAY);
 
         if (gameWon) {
             DrawText("You solved the puzzle!", WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2 - 20, 30, GREEN);
