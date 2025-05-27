@@ -32,7 +32,7 @@ const char *pairs[MAX_PAIRS][2] = {
 Card cards[MAX_CARDS];
 int selectedIndices[2] = {-1, -1};
 int matchedCount = 0;
-float gameTime = 60.0f; // 60 seconds timer
+float gameTime = 40.0f; // 60 seconds timer
 bool gameOver = false;
 Rectangle restartButton = {350, 560, 150, 30};
 
@@ -73,7 +73,7 @@ void InitCards() {
     selectedIndices[0] = -1;
     selectedIndices[1] = -1;
     matchedCount = 0;
-    gameTime = 60.0f;
+    gameTime = 40.0f;
     gameOver = false;
 }
 
@@ -143,7 +143,7 @@ void DrawCard(Card *card, Font font) {
 }
 
 int main(void) {
-    InitWindow(900, 700, "Memory Match Game - Spirit Animals");
+    InitWindow(900, 700, "Memory Match Game");
     InitAudioDevice();
     SetTargetFPS(60);
     srand(time(NULL));
