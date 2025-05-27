@@ -28,10 +28,20 @@ void toggle(int x, int y) {
 }
 
 void randomizeGrid() {
+    // Start with all OFF (or all ON, depending on your win condition)
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
-            grid[i][j] = GetRandomValue(0, 1);
+            grid[i][j] = 1;
+
+    // Apply a number of random valid toggle moves
+    int moves = GetRandomValue(10, 25); // random number of shuffles
+    for (int k = 0; k < moves; k++) {
+        int i = GetRandomValue(0, N - 1);
+        int j = GetRandomValue(0, N - 1);
+        toggle(i, j);
+    }
 }
+
 
 bool checkWin() {
     for (int i = 0; i < N; i++)
