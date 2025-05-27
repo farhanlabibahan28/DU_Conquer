@@ -32,7 +32,7 @@ const char *pairs[MAX_PAIRS][2] = {
 Card cards[MAX_CARDS];
 int selectedIndices[2] = {-1, -1};
 int matchedCount = 0;
-float gameTime = 40.0f; // 60 seconds timer
+float gameTime = 40.0f; // 40 seconds timer
 bool gameOver = false;
 Rectangle restartButton = {350, 560, 150, 30};
 
