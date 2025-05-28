@@ -47,99 +47,98 @@ static bool IsMouseOver(Rectangle rect) {
 }
 
 void PlayLIGHTSON() {
-    // Load textures
-    Texture2D lightOn = LoadTexture("light_on.png");
-    Texture2D lightOff = LoadTexture("light_off.png");
+    // Load textures only once
+    static bool texturesLoaded = false;
+    static Texture2D lightOn;
+    static Texture2D lightOff;
+    static int moveCount = 0;
+    static float elapsedTime = 0;
+    static float flashTimer = 0;
+    static bool gameStarted = false;
+    static bool win = false;
+    static Rectangle restartBtn = {WINDOW_WIDTH - 130, 15, 100, 30};
+    if (!texturesLoaded) {
+        lightOn = LoadTexture("light_on.png");
+        lightOff = LoadTexture("light_off.png");
+        if (lightOn.id == 0 || lightOff.id == 0) {
+            printf("Error: Could not load textures.\n");
+            return;
+        }
+        randomizeGrid();
+        moveCount = 0;
+        elapsedTime = 0;
+        flashTimer = 0;
+        gameStarted = false;
+        win = false;
+        texturesLoaded = true;
+    }
 
-    if (lightOn.id == 0 || lightOff.id == 0) {
-        printf("Error: Could not load textures.\n");
+    if (IsKeyPressed(KEY_ESCAPE)) {
+        currentGameState = MAIN_ROOM;
         return;
     }
 
-    randomizeGrid();
-
-    int moveCount = 0;
-    float elapsedTime = 0;
-    float flashTimer = 0;
-    bool gameStarted = false;
-    bool win = false;
-
-    Rectangle restartBtn = {WINDOW_WIDTH - 130, 15, 100, 30};
-
-    while (!WindowShouldClose()) {
-        if (IsKeyPressed(KEY_ESCAPE)) {
-    currentGameState = MAIN_ROOM;
-    break;
-}
-
-        if (!win && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            Vector2 mouse = GetMousePosition();
-            if (!IsMouseOver(restartBtn) && mouse.y > UI_HEIGHT) {
-                int row = (mouse.y - UI_HEIGHT) / CELL_SIZE;
-                int col = mouse.x / CELL_SIZE;
-                toggle(row, col);
-                moveCount++;
-                gameStarted = true;
-            }
+    if (!win && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        Vector2 mouse = GetMousePosition();
+        if (!IsMouseOver(restartBtn) && mouse.y > UI_HEIGHT) {
+            int row = (mouse.y - UI_HEIGHT) / CELL_SIZE;
+            int col = mouse.x / CELL_SIZE;
+            toggle(row, col);
+            moveCount++;
+            gameStarted = true;
         }
-
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && IsMouseOver(restartBtn)) {
-            randomizeGrid();
-            moveCount = 0;
-            elapsedTime = 0;
-            flashTimer = 0;
-            win = false;
-            gameStarted = false;
-        }
-
-        if (gameStarted && !win) {
-            elapsedTime += GetFrameTime();
-        }
-
-        if (!win && checkWin()) {
-            win = true;
-        }
-
-        if (win) {
-            flashTimer += GetFrameTime();
-        }
-
-        BeginDrawing();
-        ClearBackground(BLACK);
-
-        DrawRectangle(0, 0, WINDOW_WIDTH, UI_HEIGHT, DARKGRAY);
-        DrawRectangleRec(restartBtn, GRAY);
-        DrawText("Restart", restartBtn.x + 10, restartBtn.y + 5, 20, WHITE);
-
-        char timeStr[64];
-        snprintf(timeStr, sizeof(timeStr), "Time: %.1f sec", elapsedTime);
-        DrawText(timeStr, 10, 15, 20, WHITE);
-
-        char moveStr[64];
-        snprintf(moveStr, sizeof(moveStr), "Moves: %d", moveCount);
-        DrawText(moveStr, 150, 15, 20, WHITE);
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                Vector2 pos = { j * CELL_SIZE, i * CELL_SIZE + UI_HEIGHT };
-                if (grid[i][j]) {
-                    if (win && ((int)(flashTimer * 5) % 2 == 0)) {
-                        DrawRectangle(pos.x, pos.y, CELL_SIZE, CELL_SIZE, GOLD);
-                    }
-                    DrawTextureEx(lightOn, pos, 0.0f, (float)CELL_SIZE / lightOn.width, WHITE);
-                } else {
-                    DrawTextureEx(lightOff, pos, 0.0f, (float)CELL_SIZE / lightOff.width, WHITE);
-                }
-            }
-        }
-
-        if (win) {
-            DrawText("You Win!", WINDOW_WIDTH / 2 - 100, UI_HEIGHT + 20, 40, GREEN);
-        }
-
-        EndDrawing();
     }
 
-    UnloadTexture(lightOn);
-    UnloadTexture(lightOff);
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && IsMouseOver(restartBtn)) {
+        randomizeGrid();
+        moveCount = 0;
+        elapsedTime = 0;
+        flashTimer = 0;
+        win = false;
+        gameStarted = false;
+    }
+
+    if (gameStarted && !win) {
+        elapsedTime += GetFrameTime();
+    }
+
+    if (!win && checkWin()) {
+        win = true;
+    }
+
+    if (win) {
+        flashTimer += GetFrameTime();
+    }
+
+    ClearBackground(BLACK);
+
+    DrawRectangle(0, 0, WINDOW_WIDTH, UI_HEIGHT, DARKGRAY);
+    DrawRectangleRec(restartBtn, GRAY);
+    DrawText("Restart", restartBtn.x + 10, restartBtn.y + 5, 20, WHITE);
+
+    char timeStr[64];
+    snprintf(timeStr, sizeof(timeStr), "Time: %.1f sec", elapsedTime);
+    DrawText(timeStr, 10, 15, 20, WHITE);
+
+    char moveStr[64];
+    snprintf(moveStr, sizeof(moveStr), "Moves: %d", moveCount);
+    DrawText(moveStr, 150, 15, 20, WHITE);
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            Vector2 pos = { j * CELL_SIZE, i * CELL_SIZE + UI_HEIGHT };
+            if (grid[i][j]) {
+                if (win && ((int)(flashTimer * 5) % 2 == 0)) {
+                    DrawRectangle(pos.x, pos.y, CELL_SIZE, CELL_SIZE, GOLD);
+                }
+                DrawTextureEx(lightOn, pos, 0.0f, (float)CELL_SIZE / lightOn.width, WHITE);
+            } else {
+                DrawTextureEx(lightOff, pos, 0.0f, (float)CELL_SIZE / lightOff.width, WHITE);
+            }
+        }
+    }
+
+    if (win) {
+        DrawText("You Win!", WINDOW_WIDTH / 2 - 100, UI_HEIGHT + 20, 40, GREEN);
+    }
 }

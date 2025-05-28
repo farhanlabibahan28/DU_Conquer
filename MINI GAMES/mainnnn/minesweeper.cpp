@@ -306,7 +306,7 @@ void PlayMINESWEEPER(void) {
 
     EndTextureMode();
 
-    BeginDrawing();
+    
     ClearBackground(BLACK);
 
     DrawTexturePro(
@@ -321,5 +321,5 @@ void PlayMINESWEEPER(void) {
         (Vector2){0, 0}, 0.0f, WHITE
     );
 
-    EndDrawing();
+   
 }
