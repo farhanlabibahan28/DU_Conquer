@@ -26,7 +26,7 @@ const char *pairs[MAX_PAIRS][2] = {
     {"Raima", "irony"}, {"Rapunzel", "disney"},
     {"csedu", "death"}, {"Rana sir", "GOAT"},
     {"DU", "dream"}, {"Raisa", "cat"},
-    {"Salwa", "high"}, {"Ahan", "gay"}
+    {"Salwa", "high"}, {"Ahan", "shy"}
 };
 
 Card cards[MAX_CARDS];
