@@ -44,26 +44,28 @@ bool IsSolved() {
     return tiles[GRID_SIZE * GRID_SIZE - 1] == 0;
 }
 
-void ShuffleTiles() {
-    do {
-        for (int i = 0; i < GRID_SIZE * GRID_SIZE - 1; i++) {
-            tiles[i] = i + 1;
-        }
-        tiles[GRID_SIZE * GRID_SIZE - 1] = 0;
-        emptyIndex = GRID_SIZE * GRID_SIZE - 1;
+// void ShuffleTiles() {
+//     {
+//         for (int i = 0; i < GRID_SIZE * GRID_SIZE - 1; i++) {
+//             tiles[i] = i + 1;
+//         }
+//         tiles[GRID_SIZE * GRID_SIZE - 1] = 0;
+//         emptyIndex = GRID_SIZE * GRID_SIZE - 1;
 
-        for (int i = GRID_SIZE * GRID_SIZE - 1; i > 0; i--) {
-            int j = rand() % (i + 1);
-            int temp = tiles[i];
-            tiles[i] = tiles[j];
-            tiles[j] = temp;
-            if (tiles[i] == 0) emptyIndex = i;
-            if (tiles[j] == 0) emptyIndex = j;
-        }
-    } while (IsSolved());
+//         for (int i = 0; i <shuffleMoves; i++) {
+//             int j = rand() % (i + 1);
+//             int temp = tiles[i];
+//             tiles[i] = tiles[j];
+//             tiles[j] = temp;
+//             if (tiles[i] == 0) emptyIndex = i;
+//             if (tiles[j] == 0) emptyIndex = j;
+//         }
+//     } while (IsSolved());
 
-    moveCount = 0;
-}
+//     moveCount = 0;
+// }
+
+
 
 bool CanMove(int tileIndex) {
     int row = tileIndex / GRID_SIZE;
@@ -82,6 +84,48 @@ void MoveTile(int tileIndex) {
         emptyIndex = tileIndex;
         moveCount++;
     }
+}
+
+void ShuffleTiles() {
+    // Start from the solved state
+    for (int i = 0; i < GRID_SIZE * GRID_SIZE - 1; i++) {
+        tiles[i] = i + 1;
+    }
+    tiles[GRID_SIZE * GRID_SIZE - 1] = 0;
+    emptyIndex = GRID_SIZE * GRID_SIZE - 1;
+
+    // Make a series of valid random moves
+    int shuffleMoves = 1000;  // You can adjust this
+    for (int i = 0; i < shuffleMoves; i++) {
+        int emptyRow = emptyIndex / GRID_SIZE;
+        int emptyCol = emptyIndex % GRID_SIZE;
+
+        int directions[4][2] = {
+            { 0, -1 }, // left
+            { 0,  1 }, // right
+            { -1, 0 }, // up
+            { 1,  0 }  // down
+        };
+
+        int validMoves[4];
+        int numValidMoves = 0;
+
+        for (int d = 0; d < 4; d++) {
+            int newRow = emptyRow + directions[d][0];
+            int newCol = emptyCol + directions[d][1];
+
+            if (newRow >= 0 && newRow < GRID_SIZE && newCol >= 0 && newCol < GRID_SIZE) {
+                validMoves[numValidMoves++] = newRow * GRID_SIZE + newCol;
+            }
+        }
+
+        if (numValidMoves > 0) {
+            int chosen = validMoves[rand() % numValidMoves];
+            MoveTile(chosen);  // Use your existing MoveTile function
+        }
+    }
+
+    moveCount = 0;
 }
 
 int main(void) {
