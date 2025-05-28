@@ -1,19 +1,20 @@
-#include "raylib.h"
+#include"raylib.h"
 #include <string>
 #include <array>
-#include "game_states.h"
-extern GameState currentGameState;
-
+#include <iostream>
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-const int BOARD_SIZE = 600;
-const int CELL_SIZE = BOARD_SIZE / 3;
-const int BOARD_POS_X = (WINDOW_WIDTH - BOARD_SIZE) / 2;
-const int BOARD_POS_Y = (WINDOW_HEIGHT - BOARD_SIZE) / 2;
+const int BOARD_POS_X = 200;
+const int BOARD_POS_Y = 100;
 
-enum class TicTacToeState { EnteringNames, Playing, GameOver };
-
+const int BOARD_SIZE = 300;  // 3x3 grid assumed
+const int CELL_SIZE = BOARD_SIZE / 3;  // each cell size
+enum class TicTacToeState {
+    EnteringNames,
+    Playing,
+    GameOver
+};
 void PlayTICTACTOE() {
     static TicTacToeState ticState = TicTacToeState::EnteringNames;
     static std::string playerName = "";
@@ -23,19 +24,6 @@ void PlayTICTACTOE() {
     static std::string winner = "";
 
     static Rectangle restartButton = { WINDOW_WIDTH / 2 - 100, WINDOW_HEIGHT - 70, 200, 50 };
-
-    // ESC key to return to Main Room
-    if (IsKeyPressed(KEY_ESCAPE)) {
-        ticState = TicTacToeState::EnteringNames;
-        playerName.clear();
-        xTurn = true;
-        winner.clear();
-        for (auto &row : board)
-            for (auto &cell : row)
-                cell.clear();
-        currentGameState = MAIN_ROOM;
-        return;
-    }
 
     auto checkWin = [&]() -> bool {
         for (int i = 0; i < 3; ++i) {
@@ -136,8 +124,7 @@ void PlayTICTACTOE() {
         }
     }
 
-    // Drawing
-    BeginDrawing();
+    // Drawing (NO BeginDrawing / EndDrawing here)
     ClearBackground((Color){40, 44, 52, 255}); // dark background
 
     if (ticState == TicTacToeState::EnteringNames) {
@@ -150,13 +137,13 @@ void PlayTICTACTOE() {
         DrawText(displayName.c_str(), 50, 160, 28, YELLOW);
     }
     else {
-        // Grid
+        // Grid lines
         for (int i = 1; i < 3; ++i) {
             DrawRectangle(BOARD_POS_X, BOARD_POS_Y + i * CELL_SIZE, BOARD_SIZE, 4, (Color){180, 180, 180, 255});
             DrawRectangle(BOARD_POS_X + i * CELL_SIZE, BOARD_POS_Y, 4, BOARD_SIZE, (Color){180, 180, 180, 255});
         }
 
-        // X and O
+        // Draw X and O
         for (int r = 0; r < 3; ++r) {
             for (int c = 0; c < 3; ++c) {
                 if (!board[r][c].empty()) {
@@ -186,6 +173,4 @@ void PlayTICTACTOE() {
             DrawText((turn + "'s Turn (" + (xTurn ? "X" : "O") + ")").c_str(), 10, 10, 24, WHITE);
         }
     }
-
-    EndDrawing();
 }
