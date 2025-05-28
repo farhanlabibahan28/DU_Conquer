@@ -43,7 +43,7 @@ int main(void) {
 
     bool gameOver = false;
 
-    SetTargetFPS(10);
+    SetTargetFPS(5);
 
     while (!WindowShouldClose()) {
         if (!gameOver) {
