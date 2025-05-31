@@ -1,0 +1,168 @@
+{ "columns":0,
+ "grid":
+    {
+     "height":1,
+     "orientation":"orthogonal",
+     "width":1
+    },
+ "margin":0,
+ "name":"building",
+ "spacing":0,
+ "tilecount":25,
+ "tiledversion":"1.11.2",
+ "tileheight":440,
+ "tiles":[
+        {
+         "id":0,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/empty tile 1.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":1,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Hellesglashaustest1.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":2,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Hochhaus.1.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":3,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Hochhaus.2.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":4,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Hochhaus.3.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":5,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Hochhaus.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":6,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/HochhausA.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":7,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/HochhausB.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":8,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/HochhausC.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":9,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0000.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":10,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0001.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":11,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0010.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":12,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0011.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":13,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0100.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":14,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0101.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":15,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0110.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":16,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_0111.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":17,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1000.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":18,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1001.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":19,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1010.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":20,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1011.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":21,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1100.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":22,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1101.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":23,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1110.png",
+         "imageheight":440,
+         "imagewidth":160
+        }, 
+        {
+         "id":24,
+         "image":"..\/Tiles Image\/citybuilder-tileset\/Stra\u00e1eB_1111.png",
+         "imageheight":440,
+         "imagewidth":160
+        }],
+ "tilewidth":160,
+ "type":"tileset",
+ "version":"1.10"
+}

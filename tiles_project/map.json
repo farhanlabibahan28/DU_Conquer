@@ -3168,19 +3168,19 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"road.tsx"
+         "source":"road.json"
         }, 
         {
          "firstgid":71,
-         "source":"grass.tsx"
+         "source":"grass.json"
         }, 
         {
          "firstgid":198,
-         "source":"building.tsx"
+         "source":"building.json"
         }, 
         {
          "firstgid":223,
-         "source":"house tiles.tsx"
+         "source":"house tiles.json"
         }],
  "tilewidth":64,
  "type":"map",
