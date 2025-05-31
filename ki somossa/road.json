@@ -1,0 +1,24 @@
+{ "columns":0,
+ "grid":
+    {
+     "height":1,
+     "orientation":"orthogonal",
+     "width":1
+    },
+ "margin":0,
+ "name":"road",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":65,
+ "tiles":[
+        {
+         "id":0,
+         "image":"grass.png",
+         "imageheight":65,
+         "imagewidth":100
+        }],
+ "tilewidth":100,
+ "type":"tileset",
+ "version":"1.10"
+}
