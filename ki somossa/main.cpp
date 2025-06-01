@@ -1,135 +1,101 @@
-#include <raylib.h>
+#include "raylib.h"
 #include "tileson.hpp"
-#include <map>
-#include <tuple>
-#include <string>
-#include <iostream>
-#include <algorithm>
+#include <filesystem>
+namespace fs = std::filesystem;
 
-using namespace std;
-
-map<int, Texture2D> tileTextures;
-Camera2D camera = { 0 };
-
-Vector2 isometricToScreen(const Vector2& tilePos, float tileWidth, float tileHeight) {
-    return {
-        (tilePos.x - tilePos.y) * (tileWidth / 2.0f),
-        (tilePos.x + tilePos.y) * (tileHeight / 2.0f)
-    };
-}
+// using namespace tson;
 
 int main() {
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
-    InitWindow(screenWidth, screenHeight, "Isometric Tiled Map");
+    InitWindow(1200, 800, "Isometric Map Viewer");
     SetTargetFPS(60);
 
+    // Load tile texture
+    Texture2D tileset = LoadTexture("grass.png");
+
+    // Parse map.json
+    tson::Tileson parser;
+    auto map = parser.parse(fs::path("please.json"));
+    if (map->getStatus() != tson::ParseStatus::OK) {
+        TraceLog(LOG_ERROR, "Failed to load map: %s", map->getStatusMessage().c_str());
+        CloseWindow();
+        return 1;
+    }
+
+    int tileWidth = map->getTileSize().x;
+    int tileHeight = map->getTileSize().y;
+
     // Initialize camera
+    Camera2D camera = { 0 };
     camera.target = { 0, 0 };
-    camera.offset = { screenWidth/2.0f, screenHeight/2.0f };
+    camera.offset = { 600, 400 }; // center of screen
     camera.zoom = 1.0f;
 
-    // Load map
-    tson::Tileson parser;
-    unique_ptr<tson::Map> map = parser.parse("please.json");
-    
-    if (map->getStatus() != tson::ParseStatus::OK) {
-        cerr << "Map load error: " << map->getStatusMessage() << endl;
-        CloseWindow();
-        return -1;
-    } else {
-        cout << "Map loaded successfully! Size: " 
-             << map->getSize().x << "x" << map->getSize().y << endl;
-    }
-
-    // Load textures
-    for (auto& tileset : map->getTilesets()) {
-        string imagePath = tileset.getImagePath();
-        cout << "Loading tileset: " << imagePath << endl;
-        
-        Image tilesetImage = LoadImage(imagePath.c_str());
-        if (tilesetImage.data == NULL) {
-            cerr << "Failed to load: " << imagePath << endl;
-            continue;
-        }
-
-        int firstGid = tileset.getFirstgid();
-        int tileWidth = tileset.getTileSize().x;
-        int tileHeight = tileset.getTileSize().y;
-        int columns = tileset.getColumns();
-        int tileCount = tileset.getTileCount();
-        
-        cout << "Processing " << tileCount << " tiles..." << endl;
-        
-        for (int i = 0; i < tileCount; i++) {
-            int gid = firstGid + i;
-            int x = (i % columns) * tileWidth;
-            int y = (i / columns) * tileHeight;
-            
-            Rectangle tileRect = {
-                (float)x, (float)y,
-                (float)tileWidth, (float)tileHeight
-            };
-            
-            Image tileImage = ImageFromImage(tilesetImage, tileRect);
-            tileTextures[gid] = LoadTextureFromImage(tileImage);
-            UnloadImage(tileImage);
-        }
-        
-        UnloadImage(tilesetImage);
-    }
-
-    cout << "Loaded " << tileTextures.size() << " tile textures" << endl;
-
-    // Main game loop
+    // Game loop
     while (!WindowShouldClose()) {
-        // Camera controls
-        if (IsKeyDown(KEY_RIGHT)) camera.target.x += 5;
-        if (IsKeyDown(KEY_LEFT)) camera.target.x -= 5;
-        if (IsKeyDown(KEY_UP)) camera.target.y -= 5;
-        if (IsKeyDown(KEY_DOWN)) camera.target.y += 5;
-        camera.zoom = fmaxf(0.1f, fminf(camera.zoom + GetMouseWheelMove()*0.1f, 3.0f));
+        // Camera movement
+        if (IsKeyDown(KEY_RIGHT)) camera.target.x += 10;
+        if (IsKeyDown(KEY_LEFT)) camera.target.x -= 10;
+        if (IsKeyDown(KEY_DOWN)) camera.target.y += 10;
+        if (IsKeyDown(KEY_UP)) camera.target.y -= 10;
+
+        camera.zoom += GetMouseWheelMove() * 0.1f;
+        if (camera.zoom < 0.2f) camera.zoom = 0.2f;
+        if (camera.zoom > 3.0f) camera.zoom = 3.0f;
 
         BeginDrawing();
-        ClearBackground(BLACK);
+        ClearBackground(RAYWHITE);
 
-        BeginMode2D(camera);
-        
-        // Draw all layers
+        BeginMode2D(camera);  // <-- Camera starts here
+
         for (auto& layer : map->getLayers()) {
-            if (layer.getType() == tson::LayerType::TileLayer) {
-                for (const auto& [pos, tile] : layer.getTileData()) {
-                    int gid = tile->getGid();
-                    if (gid == 0 || tileTextures.find(gid) == tileTextures.end()) continue;
+            if (layer.getType() != tson::LayerType::TileLayer) continue;
 
-                    float tileW = (float)map->getTileSize().x;
-                    float tileH = (float)map->getTileSize().y;
-                    
-                    Vector2 screenPos = isometricToScreen(
-                        { (float)get<0>(pos), (float)get<1>(pos) },
-                        tileW, tileH
-                    );
+            for (const auto& item : layer.getTileData()) {
+                auto pos = item.first;
+                tson::Tile* tile = item.second;
+                if (!tile) continue;
 
-                    DrawTextureV(tileTextures[gid], screenPos, WHITE);
-                }
+                const tson::Tileset* ts = tile->getTileset();
+                if (!ts) continue;
+
+                // Get source rect from tileset
+                tson::Rect rect = const_cast<tson::Tileset*>(ts)->getTile(tile->getId())->getDrawingRect();
+                Rectangle src = {
+                    (float)rect.x,
+                    (float)rect.y,
+                    (float)rect.width,
+                    (float)rect.height
+                };
+
+                // Convert to isometric position
+                int x = std::get<0>(pos);
+                int y = std::get<1>(pos);
+
+                float isoX = (x - y) * (tileWidth / 2.0f);
+                float isoY = (x + y) * (tileHeight / 2.0f) / 2;
+
+                Rectangle dest = {
+                    isoX,
+                    isoY,
+                    (float)tileWidth,
+                    (float)tileHeight
+                };
+
+                DrawTexturePro(tileset, src, dest, {0, 0}, 0.0f, WHITE);
             }
         }
-        
-        EndMode2D();
+
+        EndMode2D(); // <-- Camera ends here
 
         // Debug info
-        DrawText(TextFormat("Camera: (%.1f, %.1f)", camera.target.x, camera.target.y), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Zoom: %.1f", camera.zoom), 10, 40, 20, WHITE);
+        DrawText(TextFormat("Camera: (%.1f, %.1f)", camera.target.x, camera.target.y), 10, 10, 20, DARKGRAY);
+        DrawText(TextFormat("Zoom: %.2f", camera.zoom), 10, 40, 20, DARKGRAY);
         DrawFPS(10, 70);
 
         EndDrawing();
     }
 
-    // Cleanup
-    for (auto& [id, tex] : tileTextures) {
-        UnloadTexture(tex);
-    }
-
+    UnloadTexture(tileset);
     CloseWindow();
     return 0;
 }
