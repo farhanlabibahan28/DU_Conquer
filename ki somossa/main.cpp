@@ -10,11 +10,11 @@ int main() {
     SetTargetFPS(60);
 
     // Load tile texture
-    Texture2D tileset = LoadTexture("grass.png");
+    Texture2D tileset = LoadTexture("master_tilesheet.png");
 
     // Parse map.json
     tson::Tileson parser;
-    auto map = parser.parse(fs::path("please.json"));
+    auto map = parser.parse(fs::path("map.json"));
     if (map->getStatus() != tson::ParseStatus::OK) {
         TraceLog(LOG_ERROR, "Failed to load map: %s", map->getStatusMessage().c_str());
         CloseWindow();
@@ -72,7 +72,7 @@ int main() {
                 int y = std::get<1>(pos);
 
                 float isoX = (x - y) * (tileWidth / 2.0f);
-                float isoY = (x + y) * (tileHeight / 2.0f) / 2;
+                float isoY = (x + y) * (tileHeight / 2.0f);
 
                 Rectangle dest = {
                     isoX,
