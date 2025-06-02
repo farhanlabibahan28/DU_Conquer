@@ -1,99 +1,89 @@
 #include "raylib.h"
-#include "tileson.hpp"
-#include <filesystem>
-namespace fs = std::filesystem;
+#include <stdio.h>
+
+typedef struct Zone {
+    Rectangle rect;
+    const char* name;
+    Color color;
+} Zone;
 
 int main() {
-    InitWindow(1200, 800, "Isometric Map Viewer");
+    InitWindow(1200, 800, "Image with Camera and Zones");
     SetTargetFPS(60);
 
-    // Load tile texture
-    Texture2D tileset = LoadTexture("master_tilesheet.png");
+    // Load the background image
+    Image img = LoadImage("untitled.png"); // Replace with your image
+    Texture2D background = LoadTextureFromImage(img);
+    UnloadImage(img);
 
-    // Parse map.json
-    tson::Tileson parser;
-    auto map = parser.parse(fs::path("map.json"));
-    if (map->getStatus() != tson::ParseStatus::OK) {
-        TraceLog(LOG_ERROR, "Failed to load map: %s", map->getStatusMessage().c_str());
-        CloseWindow();
-        return 1;
-    }
-
-    int tileWidth = map->getTileSize().x;
-    int tileHeight = map->getTileSize().y;
-
-    // Adjustable Y-stretch factor
-    float yStretchFactor = 0.5f;  // <--- change this (e.g. 0.6f, 0.4f) to tune vertical squish
-
-    // Initialize camera
+    // Define camera
     Camera2D camera = { 0 };
-    camera.target = { 0, 0 };
-    camera.offset = { 600, 400 }; // center of screen
+    camera.target = (Vector2){ 0, 0 };
+    camera.offset = (Vector2){ GetScreenWidth()/2, GetScreenHeight()/2 };
     camera.zoom = 1.0f;
 
+    // Define player position (in world space)
+    Vector2 playerPos = { 200, 200 };
+    float playerRadius = 10;
+
+    // Define zones
+    Zone zones[] = {
+        {{1200, 1200, 200, 150}, "Lava Zone", RED},
+        {{4000, 3000, 180, 120}, "Safe Zone", GREEN},
+        {{7000, 5000, 150, 100}, "Trigger Zone", ORANGE}
+    };
+    int zoneCount = sizeof(zones) / sizeof(zones[0]);
+
     while (!WindowShouldClose()) {
-        // Camera movement
+        // --- CAMERA CONTROLS ---
         if (IsKeyDown(KEY_RIGHT)) camera.target.x += 10;
-        if (IsKeyDown(KEY_LEFT)) camera.target.x -= 10;
-        if (IsKeyDown(KEY_DOWN)) camera.target.y += 10;
-        if (IsKeyDown(KEY_UP)) camera.target.y -= 10;
+        if (IsKeyDown(KEY_LEFT))  camera.target.x -= 10;
+        if (IsKeyDown(KEY_DOWN))  camera.target.y += 10;
+        if (IsKeyDown(KEY_UP))    camera.target.y -= 10;
 
         camera.zoom += GetMouseWheelMove() * 0.1f;
         if (camera.zoom < 0.2f) camera.zoom = 0.2f;
         if (camera.zoom > 3.0f) camera.zoom = 3.0f;
 
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        BeginMode2D(camera);
+        // --- PLAYER CONTROLS (in world space) ---
+        if (IsKeyDown(KEY_W)) playerPos.y -= 2;
+        if (IsKeyDown(KEY_S)) playerPos.y += 2;
+        if (IsKeyDown(KEY_A)) playerPos.x -= 2;
+        if (IsKeyDown(KEY_D)) playerPos.x += 2;
 
-        for (auto& layer : map->getLayers()) {
-            if (layer.getType() != tson::LayerType::TileLayer) continue;
-
-            for (const auto& item : layer.getTileData()) {
-                auto pos = item.first;
-                tson::Tile* tile = item.second;
-                if (!tile) continue;
-
-                const tson::Tileset* ts = tile->getTileset();
-                if (!ts) continue;
-
-                tson::Rect rect = const_cast<tson::Tileset*>(ts)->getTile(tile->getId())->getDrawingRect();
-                Rectangle src = {
-                    (float)rect.x,
-                    (float)rect.y,
-                    (float)rect.width,
-                    (float)rect.height
-                };
-
-                // Convert to isometric position
-                int x = std::get<0>(pos);
-                int y = std::get<1>(pos);
-
-                float isoX = (x - y) * (tileWidth / 2.0f);
-                float isoY = (x + y) * (tileHeight / 2.0f) * yStretchFactor;
-
-                Rectangle dest = {
-                    isoX,
-                    isoY,
-                    (float)tileWidth,
-                    (float)tileHeight
-                };
-
-                DrawTexturePro(tileset, src, dest, { tileWidth / 2.0f, tileHeight }, 0.0f, WHITE);
+        // --- ZONE DETECTION ---
+        const char* currentZone = "None";
+        for (int i = 0; i < zoneCount; i++) {
+            if (CheckCollisionPointRec(playerPos, zones[i].rect)) {
+                currentZone = zones[i].name;
             }
         }
 
+        // --- DRAWING ---
+        BeginDrawing();
+        ClearBackground(BLACK);
+        BeginMode2D(camera);
+
+        DrawTexture(background, 0, 0, WHITE); // Draw image at (0,0)
+
+        // Draw zones
+        for (int i = 0; i < zoneCount; i++) {
+            DrawRectangleRec(zones[i].rect, Fade(zones[i].color, 0.3f));
+            DrawRectangleLinesEx(zones[i].rect, 2, zones[i].color);
+            DrawText(zones[i].name, zones[i].rect.x + 4, zones[i].rect.y + 4, 10, zones[i].color);
+        }
+
+        // Draw player
+        DrawCircleV(playerPos, playerRadius, BLUE);
+
         EndMode2D();
 
-        DrawText(TextFormat("Camera: (%.1f, %.1f)", camera.target.x, camera.target.y), 10, 10, 20, DARKGRAY);
-        DrawText(TextFormat("Zoom: %.2f", camera.zoom), 10, 40, 20, DARKGRAY);
-        DrawText(TextFormat("Y-Stretch: %.2f", yStretchFactor), 10, 70, 20, DARKGRAY);
-        DrawFPS(10, 100);
-
+        DrawText(TextFormat("Current Zone: %s", currentZone), 10, 10, 20, YELLOW);
+        DrawFPS(10, 40);
         EndDrawing();
     }
 
-    UnloadTexture(tileset);
+    UnloadTexture(background);
     CloseWindow();
     return 0;
 }
