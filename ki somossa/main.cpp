@@ -3,8 +3,6 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-// using namespace tson;
-
 int main() {
     InitWindow(1200, 800, "Isometric Map Viewer");
     SetTargetFPS(60);
@@ -24,13 +22,15 @@ int main() {
     int tileWidth = map->getTileSize().x;
     int tileHeight = map->getTileSize().y;
 
+    // Adjustable Y-stretch factor
+    float yStretchFactor = 0.5f;  // <--- change this (e.g. 0.6f, 0.4f) to tune vertical squish
+
     // Initialize camera
     Camera2D camera = { 0 };
     camera.target = { 0, 0 };
     camera.offset = { 600, 400 }; // center of screen
     camera.zoom = 1.0f;
 
-    // Game loop
     while (!WindowShouldClose()) {
         // Camera movement
         if (IsKeyDown(KEY_RIGHT)) camera.target.x += 10;
@@ -44,8 +44,7 @@ int main() {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
-        BeginMode2D(camera);  // <-- Camera starts here
+        BeginMode2D(camera);
 
         for (auto& layer : map->getLayers()) {
             if (layer.getType() != tson::LayerType::TileLayer) continue;
@@ -58,7 +57,6 @@ int main() {
                 const tson::Tileset* ts = tile->getTileset();
                 if (!ts) continue;
 
-                // Get source rect from tileset
                 tson::Rect rect = const_cast<tson::Tileset*>(ts)->getTile(tile->getId())->getDrawingRect();
                 Rectangle src = {
                     (float)rect.x,
@@ -72,7 +70,7 @@ int main() {
                 int y = std::get<1>(pos);
 
                 float isoX = (x - y) * (tileWidth / 2.0f);
-                float isoY = (x + y) * (tileHeight / 2.0f);
+                float isoY = (x + y) * (tileHeight / 2.0f) * yStretchFactor;
 
                 Rectangle dest = {
                     isoX,
@@ -81,16 +79,16 @@ int main() {
                     (float)tileHeight
                 };
 
-                DrawTexturePro(tileset, src, dest, {0, 0}, 0.0f, WHITE);
+                DrawTexturePro(tileset, src, dest, { tileWidth / 2.0f, tileHeight }, 0.0f, WHITE);
             }
         }
 
-        EndMode2D(); // <-- Camera ends here
+        EndMode2D();
 
-        // Debug info
         DrawText(TextFormat("Camera: (%.1f, %.1f)", camera.target.x, camera.target.y), 10, 10, 20, DARKGRAY);
         DrawText(TextFormat("Zoom: %.2f", camera.zoom), 10, 40, 20, DARKGRAY);
-        DrawFPS(10, 70);
+        DrawText(TextFormat("Y-Stretch: %.2f", yStretchFactor), 10, 70, 20, DARKGRAY);
+        DrawFPS(10, 100);
 
         EndDrawing();
     }
