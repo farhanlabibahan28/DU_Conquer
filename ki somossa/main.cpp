@@ -8,11 +8,12 @@ typedef struct Zone {
 } Zone;
 
 int main() {
-    InitWindow(1200, 800, "Image with Camera and Zones");
+    InitWindow(1200, 800, "DU_Conquer");
     SetTargetFPS(60);
 
     // Load the background image
     Image img = LoadImage("untitled.png"); // Replace with your image
+    Texture2D character = LoadTexture("character.png");
     Texture2D background = LoadTextureFromImage(img);
     UnloadImage(img);
 
@@ -84,6 +85,7 @@ int main() {
     }
 
     UnloadTexture(background);
+    UnloadTexture(character);
     CloseWindow();
     return 0;
 }

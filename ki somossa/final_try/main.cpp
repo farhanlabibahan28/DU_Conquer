@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <math.h>
 
 typedef struct Zone {
     Rectangle rect;
@@ -7,24 +8,24 @@ typedef struct Zone {
     Color color;
 } Zone;
 
+Vector2 character_pos = {4523, 2873};
+float speed = 4.0f;
+
 int main() {
     InitWindow(1200, 800, "Image with Camera and Zones");
     SetTargetFPS(60);
 
     // Load the background image
     Image img = LoadImage("map.png"); // Replace with your image
+    Texture2D character = LoadTexture("character.png");
     Texture2D background = LoadTextureFromImage(img);
-    UnloadImage(img); // No longer needed
+    UnloadImage(img); // Free original image
 
     // Define camera
     Camera2D camera = { 0 };
-    camera.target = (Vector2){ 0, 0 };
+    camera.target = character_pos;
     camera.offset = (Vector2){ GetScreenWidth()/2, GetScreenHeight()/2 };
     camera.zoom = 1.0f;
-
-    // Define player position (in world space)
-    Vector2 playerPos = { 200, 200 };
-    float playerRadius = 10;
 
     // Define zones
     Zone zones[] = {
@@ -35,26 +36,42 @@ int main() {
     int zoneCount = sizeof(zones) / sizeof(zones[0]);
 
     while (!WindowShouldClose()) {
-        // --- CAMERA CONTROLS ---
-        if (IsKeyDown(KEY_RIGHT)) camera.target.x += 10;
-        if (IsKeyDown(KEY_LEFT))  camera.target.x -= 10;
-        if (IsKeyDown(KEY_DOWN))  camera.target.y += 10;
-        if (IsKeyDown(KEY_UP))    camera.target.y -= 10;
+        
+    float theta = 26.2f * DEG2RAD;
+    float cosTheta = cosf(theta);  
+    float sinTheta = sinf(theta);  
 
-        camera.zoom += GetMouseWheelMove() * 0.1f;
-        if (camera.zoom < 0.2f) camera.zoom = 0.2f;
-        if (camera.zoom > 3.0f) camera.zoom = 3.0f;
+    while (!WindowShouldClose()) {
+        Vector2 move = {0};
 
-        // --- PLAYER CONTROLS (in world space) ---
-        if (IsKeyDown(KEY_W)) playerPos.y -= 2;
-        if (IsKeyDown(KEY_S)) playerPos.y += 2;
-        if (IsKeyDown(KEY_A)) playerPos.x -= 2;
-        if (IsKeyDown(KEY_D)) playerPos.x += 2;
+        if (IsKeyDown(KEY_W)) {
+            // up-left
+            character_pos.x -= cosTheta * speed;
+            character_pos.y -= sinTheta * speed;
+        }
+        if (IsKeyDown(KEY_S)) {
+            // down-right
+            character_pos.x += cosTheta * speed;
+            character_pos.y += sinTheta * speed;
+        }
+        if (IsKeyDown(KEY_A)) {
+            // down-left
+            character_pos.x -= cosTheta * speed;
+            character_pos.y += sinTheta * speed;
+        }
+        if (IsKeyDown(KEY_D)) {
+            // up-right
+            character_pos.x += cosTheta * speed;
+            character_pos.y -= sinTheta * speed;
+        }
+
+
+        camera.target = character_pos;
 
         // --- ZONE DETECTION ---
         const char* currentZone = "None";
         for (int i = 0; i < zoneCount; i++) {
-            if (CheckCollisionPointRec(playerPos, zones[i].rect)) {
+            if (CheckCollisionPointRec(character_pos, zones[i].rect)) {
                 currentZone = zones[i].name;
             }
         }
@@ -64,7 +81,7 @@ int main() {
         ClearBackground(BLACK);
         BeginMode2D(camera);
 
-        DrawTexture(background, 0, 0, WHITE); // Draw image at (0,0)
+        DrawTexture(background, 0, 0, WHITE); // Draw map
 
         // Draw zones
         for (int i = 0; i < zoneCount; i++) {
@@ -73,17 +90,24 @@ int main() {
             DrawText(zones[i].name, zones[i].rect.x + 4, zones[i].rect.y + 4, 10, zones[i].color);
         }
 
-        // Draw player
-        DrawCircleV(playerPos, playerRadius, BLUE);
+        float scale = 0.25f; // Scale down to 25% size
+        DrawTextureEx(character,
+              (Vector2){ character_pos.x - (character.width * scale)/2, character_pos.y - (character.height * scale)/2 },
+              0.0f,
+              scale,
+              WHITE);
 
         EndMode2D();
 
         DrawText(TextFormat("Current Zone: %s", currentZone), 10, 10, 20, YELLOW);
+        DrawText(TextFormat("X: %f Y: %f", character_pos.x,character_pos.y), 10, 70, 30, RED);
         DrawFPS(10, 40);
         EndDrawing();
     }
 
     UnloadTexture(background);
+    UnloadTexture(character);
     CloseWindow();
     return 0;
+}
 }
