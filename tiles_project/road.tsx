@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="road" tilewidth="101" tileheight="80" tilecount="70" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="road" tilewidth="101" tileheight="80" tilecount="86" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="0">
   <image source="../Tiles Image/roadTiles_v2/png/roadTNorth.png" width="100" height="65"/>
@@ -210,5 +210,53 @@
  </tile>
  <tile id="69">
   <image source="../Tiles Image/roadTiles_v2/png/waterWest.png" width="100" height="65"/>
+ </tile>
+ <tile id="70">
+  <image source="../../Desktop/final selection/dark_tree.png" width="64" height="64"/>
+ </tile>
+ <tile id="71">
+  <image source="../../Desktop/final selection/flower.png" width="64" height="64"/>
+ </tile>
+ <tile id="72">
+  <image source="../../Desktop/final selection/night.png" width="64" height="64"/>
+ </tile>
+ <tile id="73">
+  <image source="../../Desktop/final selection/road (1).png" width="64" height="64"/>
+ </tile>
+ <tile id="74">
+  <image source="../../Desktop/final selection/road.png" width="64" height="64"/>
+ </tile>
+ <tile id="75">
+  <image source="../../Desktop/final selection/soil.png" width="64" height="64"/>
+ </tile>
+ <tile id="76">
+  <image source="../../Desktop/final selection/tree (1).png" width="64" height="64"/>
+ </tile>
+ <tile id="77">
+  <image source="../../Desktop/final selection/tree branch.png" width="64" height="64"/>
+ </tile>
+ <tile id="78">
+  <image source="../../Desktop/final selection/tree.png" width="64" height="64"/>
+ </tile>
+ <tile id="79">
+  <image source="../../Desktop/final selection/tree2.png" width="64" height="64"/>
+ </tile>
+ <tile id="80">
+  <image source="../../Desktop/final selection/water (1).png" width="64" height="64"/>
+ </tile>
+ <tile id="81">
+  <image source="../Tiles Image/tiled (1)1.png" width="69" height="64"/>
+ </tile>
+ <tile id="82">
+  <image source="../../Desktop/final selection/grass_2.png" width="64" height="64"/>
+ </tile>
+ <tile id="83">
+  <image source="../ki somossa/final_try/water (1).png" width="64" height="64"/>
+ </tile>
+ <tile id="84">
+  <image source="../Tiles Image/New Project.png" width="64" height="64"/>
+ </tile>
+ <tile id="85">
+  <image source="../Tiles Image/New Project (1).png" width="64" height="64"/>
  </tile>
 </tileset>

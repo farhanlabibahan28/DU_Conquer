@@ -350,7 +350,7 @@
   <image source="../Tiles Image/stone.png" width="73" height="64"/>
  </tile>
  <tile id="116">
-  <image source="../Tiles Image/tiled (1).png" width="69" height="64"/>
+  <image source="../Tiles Image/tiled (1).png" width="64" height="64"/>
  </tile>
  <tile id="117">
   <image source="../Tiles Image/tiled (2).png" width="64" height="59"/>

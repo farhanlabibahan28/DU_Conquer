@@ -16,7 +16,7 @@ int main() {
     SetTargetFPS(60);
 
     // Load the background image
-    Image img = LoadImage("map.png"); // Replace with your image
+    Image img = LoadImage("map2.png"); // Replace with your image
     Texture2D character = LoadTexture("character.png");
     Texture2D background = LoadTextureFromImage(img);
     UnloadImage(img); // Free original image
@@ -35,36 +35,30 @@ int main() {
     };
     int zoneCount = sizeof(zones) / sizeof(zones[0]);
 
-    while (!WindowShouldClose()) {
-        
     float theta = 26.2f * DEG2RAD;
     float cosTheta = cosf(theta);  
     float sinTheta = sinf(theta);  
 
     while (!WindowShouldClose()) {
+        // --- MOVEMENT INPUT ---
         Vector2 move = {0};
 
         if (IsKeyDown(KEY_W)) {
-            // up-left
             character_pos.x -= cosTheta * speed;
             character_pos.y -= sinTheta * speed;
         }
         if (IsKeyDown(KEY_S)) {
-            // down-right
             character_pos.x += cosTheta * speed;
             character_pos.y += sinTheta * speed;
         }
         if (IsKeyDown(KEY_A)) {
-            // down-left
             character_pos.x -= cosTheta * speed;
             character_pos.y += sinTheta * speed;
         }
         if (IsKeyDown(KEY_D)) {
-            // up-right
             character_pos.x += cosTheta * speed;
             character_pos.y -= sinTheta * speed;
         }
-
 
         camera.target = character_pos;
 
@@ -82,6 +76,8 @@ int main() {
         BeginMode2D(camera);
 
         DrawTexture(background, 0, 0, WHITE); // Draw map
+        DrawRectangle(0, 0, background.width, background.height, Fade(BLACK, 0.3f));
+
 
         // Draw zones
         for (int i = 0; i < zoneCount; i++) {
@@ -90,17 +86,34 @@ int main() {
             DrawText(zones[i].name, zones[i].rect.x + 4, zones[i].rect.y + 4, 10, zones[i].color);
         }
 
-        float scale = 0.25f; // Scale down to 25% size
+        float scale = 0.25f;
+
+        // --- GLOW EFFECT ---
+        // Draw lamp-style fading glow
+        // Smooth, subtle lamp-style glow
+        int layers = 20;
+        float baseRadius = (character.width * scale) * 0.11f;
+
+        for (int i = 0; i < layers; i++) {
+            float radius = baseRadius * (1.0f + i * 0.15f);
+            float alpha = 0.25f * (1.0f - (float)i / layers); // Stronger inside, fades out
+            DrawCircleV(character_pos, radius, Fade((Color){255, 200, 90, 255}, alpha));
+
+        }
+
+
+        // Draw the character on top of the glow
         DrawTextureEx(character,
-              (Vector2){ character_pos.x - (character.width * scale)/2, character_pos.y - (character.height * scale)/2 },
-              0.0f,
-              scale,
-              WHITE);
+            (Vector2){ character_pos.x - (character.width * scale)/2, character_pos.y - (character.height * scale)/2 },
+            0.0f,
+            scale,
+            WHITE);
 
         EndMode2D();
 
+        // UI
         DrawText(TextFormat("Current Zone: %s", currentZone), 10, 10, 20, YELLOW);
-        DrawText(TextFormat("X: %f Y: %f", character_pos.x,character_pos.y), 10, 70, 30, RED);
+        DrawText(TextFormat("X: %f Y: %f", character_pos.x, character_pos.y), 10, 70, 30, RED);
         DrawFPS(10, 40);
         EndDrawing();
     }
@@ -109,5 +122,4 @@ int main() {
     UnloadTexture(character);
     CloseWindow();
     return 0;
-}
 }
