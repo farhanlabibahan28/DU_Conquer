@@ -39,8 +39,8 @@ public:
 };
 
 int main() {
-    const int screenWidth = 1200;
-    const int screenHeight = 800;
+    const int screenWidth = GetMonitorWidth(0);
+    const int screenHeight = GetMonitorHeight(0);
 
     InitWindow(screenWidth, screenHeight, "DU_Conquer");
     Texture2D main_menu = LoadTexture("resources/main_menu.png");
@@ -50,12 +50,12 @@ int main() {
     int spacing = 40;
     int startY = 400;
 
-    Button btnNew(25, startY + spacing * 0, buttonWidth, buttonHeight, "New Game");
-    Button btnHigh(25, startY + spacing * 1, buttonWidth, buttonHeight, "High Score");
-    Button btnHelp(25, startY + spacing * 2, buttonWidth, buttonHeight, "Help");
-    Button btnMap(25, startY + spacing * 3, buttonWidth, buttonHeight, "Map");
-    Button btnSaved(25, startY + spacing * 4, buttonWidth, buttonHeight, "Saved Games");
-    Button btnExit(25, startY + spacing * 5, buttonWidth, buttonHeight, "Exit");
+    Button btnNew(screenWidth, startY + spacing * 0, buttonWidth, buttonHeight, "New Game");
+    Button btnHigh(screenWidth, startY + spacing * 1, buttonWidth, buttonHeight, "High Score");
+    Button btnHelp(screenWidth, startY + spacing * 2, buttonWidth, buttonHeight, "Help");
+    Button btnMap(screenWidth, startY + spacing * 3, buttonWidth, buttonHeight, "Map");
+    Button btnSaved(screenWidth, startY + spacing * 4, buttonWidth, buttonHeight, "Saved Games");
+    Button btnExit(screenWidth, startY + spacing * 5, buttonWidth, buttonHeight, "Exit");
 
     const char* clickedMessage = nullptr;
     bool high_score_b = false;
