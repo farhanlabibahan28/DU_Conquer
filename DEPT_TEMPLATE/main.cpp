@@ -20,7 +20,8 @@ bool game_win = false;
 Texture2D character,bg_image;
 float scale;
 bool lightsOnWin = false;
-Vector2 playerPos = {-20, 410};
+// Vector2 playerPos = {-20, GetScreenHeight()-character.height-10};
+Vector2 playerPos = {0};  // <-- this line is REQUIRED
 Vector2 game_zone = {1200,700};
 Vector2 exit_zone = {50,700};
 string pop_up = "Find and Solve the Clue";
@@ -55,6 +56,14 @@ void init_eee()
     SetMusicVolume(walk_music, 1.0f);
     character = LoadTexture("character.png");
     bg_image = LoadTexture("HISTORY_EX.png");
+    
+
+    // Now set correct position AFTER loading character
+    playerPos = (Vector2){
+        10,  // X position from left
+        (float)GetScreenHeight() - character.height - 10  // Y position from bottom
+    };
+
     camera.target = playerPos;  
     camera.offset = (Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
     camera.rotation = 0.0f;
