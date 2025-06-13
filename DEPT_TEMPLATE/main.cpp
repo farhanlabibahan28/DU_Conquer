@@ -61,7 +61,7 @@ void init_eee()
     // Now set correct position AFTER loading character
     playerPos = (Vector2){
         10,  // X position from left
-        (float)GetScreenHeight() - character.height - 10  // Y position from bottom
+        (float)GetScreenHeight() - character.height - 0.0015 * GetScreenHeight()  // Y position from bottom
     };
 
     camera.target = playerPos;  
