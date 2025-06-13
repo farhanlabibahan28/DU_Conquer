@@ -14,7 +14,8 @@ public:
         : bounds{ x, y, width, height },
           label(text),
           textColorNormal(WHITE),
-          textColorHover(RED) {}
+          textColorHover{255, 0, 255, 255}  // Purple-ish hover color
+    {}
 
     bool IsHovered() const {
         return CheckCollisionPointRec(GetMousePosition(), bounds);
@@ -25,15 +26,17 @@ public:
     }
 
     void DrawButton(int fontSize, Color bgColor) const {
-        DrawRectangleRec(bounds, bgColor);
-        Color currentTextColor = IsHovered() ? textColorHover : textColorNormal;
-        int textWidth = MeasureText(label, fontSize);
-        DrawText(label,
-                 bounds.x + (bounds.width - textWidth) / 2,
-                 bounds.y + (bounds.height - fontSize) / 2,
-                 fontSize,
-                 currentTextColor);
+    // DrawRectangleRec(bounds, bgColor); // ❌ remove or comment this line
+
+    Color currentTextColor = IsHovered() ? textColorHover : textColorNormal;
+    int textWidth = MeasureText(label, fontSize);
+    DrawText(label,
+             bounds.x + (bounds.width - textWidth) / 2,
+             bounds.y + (bounds.height - fontSize) / 2,
+             fontSize,
+             currentTextColor);
     }
+
 };
 
 #endif // BUTTON_H
