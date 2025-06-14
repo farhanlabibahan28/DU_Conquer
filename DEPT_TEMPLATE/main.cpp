@@ -54,7 +54,7 @@ void init_eee()
     walk_music = LoadMusicStream("walk.mp3");
     SetMusicVolume(walk_music, 1.0f);
     character = LoadTexture("character.png");
-    bg_image = LoadTexture("HISTORY_EX.png");
+    bg_image = LoadTexture("EEE_EX.png");
     scale = (float)GetMonitorHeight(0) / bg_image.height;
     float y_pos_floor = (float)GetMonitorHeight(0) - scale*350;
     playerPos = (Vector2){-10, y_pos_floor};
@@ -218,6 +218,12 @@ void logic_draw_eee()
             Rectangle okBtn = { screenW/2 - 50, screenH/2 + 30, 100, 40 };
             Vector2 mouse = GetMousePosition();
             Color btnColor = CheckCollisionPointRec(mouse, okBtn) ? RED : DARKGRAY;
+            static bool wasHovering = false;
+            bool isHovering = CheckCollisionPointRec(mouse, okBtn);
+            if (isHovering && !wasHovering) {
+                PlaySound(click_sound);
+            }
+            wasHovering = isHovering;
             DrawRectangleRec(okBtn, btnColor);
             DrawText("OK", screenW/2 - MeasureText("OK", 20)/2, screenH/2 + 40, 20, WHITE);
 
