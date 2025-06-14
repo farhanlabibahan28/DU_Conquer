@@ -20,8 +20,7 @@ bool game_win = false;
 Texture2D character,bg_image;
 float scale;
 bool lightsOnWin = false;
-// Vector2 playerPos = {-20, GetScreenHeight()-character.height-10};
-Vector2 playerPos = {0};  // <-- this line is REQUIRED
+Vector2 playerPos = {-20, 410};
 Vector2 game_zone = {1200,700};
 Vector2 exit_zone = {50,700};
 string pop_up = "Find and Solve the Clue";
@@ -56,14 +55,12 @@ void init_eee()
     SetMusicVolume(walk_music, 1.0f);
     character = LoadTexture("character.png");
     bg_image = LoadTexture("HISTORY_EX.png");
+    scale = (float)GetMonitorHeight(0) / bg_image.height;
+    float y_pos_floor = (float)GetMonitorHeight(0) - scale*350;
+    playerPos = (Vector2){-10, y_pos_floor};
     
-
-    // Now set correct position AFTER loading character
-    playerPos = (Vector2){
-        10,  // X position from left
-        (float)GetScreenHeight() - character.height - 0.0015 * GetScreenHeight()  // Y position from bottom
-    };
-
+    game_zone = {scale*1200,y_pos_floor}; 
+    exit_zone = {scale*10,y_pos_floor}; 
     camera.target = playerPos;  
     camera.offset = (Vector2){ GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
     camera.rotation = 0.0f;
@@ -121,7 +118,7 @@ void logic_draw_eee()
 
             bool eKeyHandled = false;
 
-            if (CheckCollisionCircles(playerPos, 150.0f,game_zone, 150.0f)) {
+            if (CheckCollisionCircles(playerPos, 50.0f,game_zone, 50.0f)) {
                 pop_up = "Press E to Solve";
                 if(IsKeyPressed(KEY_E) && !game_win && !show_rules_popup)
                 {
@@ -133,13 +130,14 @@ void logic_draw_eee()
                 }
             }
 
-            if (CheckCollisionCircles(playerPos, 150.0f,exit_zone, 150.0f)) {
+            if (CheckCollisionCircles(playerPos, 50.0f,exit_zone, 50.0f)) {
                 pop_up = "Press E to Exit";
                 if(IsKeyPressed(KEY_E))
                 {
                     PlaySound(click_sound);
-                    unload_eee();
+                    UnloadLightsOn();
                     eKeyHandled = true;
+                    break;
                 }
                 else if(IsKeyPressed(KEY_E)) {
                     PlaySound(error_sound);
@@ -192,6 +190,8 @@ void logic_draw_eee()
         DrawTextureEx(bg_image, (Vector2){0, 0}, 0.0f, scale, WHITE);
         DrawTexture(character, playerPos.x, playerPos.y, WHITE);
         DrawCircleV(game_zone, 20, RED);
+        DrawCircleV(exit_zone, 20, GREEN);
+        DrawCircleV(playerPos, 20, BLUE);
         EndMode2D();
 
         
@@ -199,7 +199,7 @@ void logic_draw_eee()
 
         DrawText(game_pop_up.c_str(), 20, GetMonitorHeight(0)-100, 20, GREEN);
 
-        if (game_win && CheckCollisionCircles(playerPos, 150.0f, exit_zone, 150.0f)) {
+        if (game_win && CheckCollisionCircles(playerPos, 50.0f, exit_zone, 50.0f)) {
             DrawText("Press E to Exit", 20, GetMonitorHeight(0)-70, 20, RAYWHITE);
         } else if (!game_win) {
             DrawText(pop_up.c_str(), 20, GetMonitorHeight(0)-50, 20, RAYWHITE);
