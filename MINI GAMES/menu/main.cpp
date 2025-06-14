@@ -139,7 +139,15 @@ int main() {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        DrawTextureEx(main_menu, (Vector2){0, 0}, 0.0f, scale, WHITE);
+        DrawTexturePro(
+        main_menu,
+        (Rectangle){0, 0, (float)main_menu.width, (float)main_menu.height},
+        (Rectangle){0, 0, (float)GetMonitorWidth(0), (float)GetMonitorHeight(0)},
+        (Vector2){0, 0},
+        0.0f,
+        WHITE
+    );
+
         DrawTextureEx(cloud, cloudPos, 3.0f, 1.1 *scale, MAGENTA);
         DrawText("DU Conquer", startX-15, startY - spacing * 8, 55 * scale, MAGENTA);
 
