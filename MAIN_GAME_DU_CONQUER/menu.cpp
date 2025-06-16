@@ -7,20 +7,14 @@ Color red = {255, 0, 0, 255};
 Color blackTransparent = {0, 0, 0, 128};
 Vector2 cloudPos = {0,0};
 
-const int MAX_HOVER_SOUNDS = 4;
-Sound hoverSounds[MAX_HOVER_SOUNDS];
-int currentHoverSound = 0;
+Sound hoverSound;
 
 void InitHoverSounds() {
-    Sound baseSound = LoadSound("resources/click.mp3");
-    for (int i = 0; i < MAX_HOVER_SOUNDS; i++) {
-        hoverSounds[i] = baseSound;
-    }
+    hoverSound = LoadSound("resources/click.mp3");
 }
 
 void PlayHoverSound() {
-    PlaySound(hoverSounds[currentHoverSound]);
-    currentHoverSound = (currentHoverSound + 1) % MAX_HOVER_SOUNDS;
+    PlaySound(hoverSound);
 }
 
 Music bgmMenu;
@@ -111,11 +105,10 @@ void init_menu() {
 void logic_draw_menu() {
     
     // while (true) {
-        if (clickedMessage && strcmp(clickedMessage, "New Game clicked!") == 0) 
-        {
-            state_of_game = LAYER_MAP;
-            // return;
-        }
+        if (clickedMessage && strcmp(clickedMessage, "New Game clicked!") == 0) {
+    state_of_game = LAYER_MAP;
+    clickedMessage = nullptr;  // <-- ADD THIS to stop toggling
+}
 
         
         int boxWidth = (int)(500 * scale);
@@ -128,28 +121,28 @@ void logic_draw_menu() {
         // Mouse Clicks
         if (btnNew.IsHovered() && !wasHoveredNew) PlayHoverSound();
         wasHoveredNew = btnNew.IsHovered();
-        if (btnNew.IsClicked()) { PlaySound(hoverSounds[0]); clickedMessage = "New Game clicked!"; }
+        if (btnNew.IsClicked()) { PlaySound(hoverSound); clickedMessage = "New Game clicked!"; }
 
         if (btnHigh.IsHovered() && !wasHoveredHigh) PlayHoverSound();
         wasHoveredHigh = btnHigh.IsHovered();
-        if (btnHigh.IsClicked()) { PlaySound(hoverSounds[0]); clickedMessage = "High Scores"; high_score_b = true; }
+        if (btnHigh.IsClicked()) { PlaySound(hoverSound); clickedMessage = "High Scores"; high_score_b = true; }
 
         if (btnHelp.IsHovered() && !wasHoveredHelp) PlayHoverSound();
         wasHoveredHelp = btnHelp.IsHovered();
-        if (btnHelp.IsClicked()) { PlaySound(hoverSounds[0]); showHelp = true; }
+        if (btnHelp.IsClicked()) { PlaySound(hoverSound); showHelp = true; }
 
         if (btnMap.IsHovered() && !wasHoveredMap) PlayHoverSound();
         wasHoveredMap = btnMap.IsHovered();
-        if (btnMap.IsClicked()) { PlaySound(hoverSounds[0]); showMap = true; }
+        if (btnMap.IsClicked()) { PlaySound(hoverSound); showMap = true; }
 
         if (btnSaved.IsHovered() && !wasHoveredSaved) PlayHoverSound();
         wasHoveredSaved = btnSaved.IsHovered();
-        if (btnSaved.IsClicked()) { PlaySound(hoverSounds[0]); clickedMessage = "Saved Games clicked!"; }
+        if (btnSaved.IsClicked()) { PlaySound(hoverSound); clickedMessage = "Saved Games clicked!"; }
 
         if (btnExit.IsHovered() && !wasHoveredExit) PlayHoverSound();
         wasHoveredExit = btnExit.IsHovered();
         if (btnExit.IsClicked()) { 
-            PlaySound(hoverSounds[0]); 
+            PlaySound(hoverSound); 
             state_of_game = LAYER_EXIT;
             // return; 
         }
@@ -343,11 +336,9 @@ void unload_menu() {
         mapTexture.id = 0;
     }
 
-    for (int i = 0; i < MAX_HOVER_SOUNDS; i++) {
-        if (hoverSounds[i].frameCount > 0) {
-            UnloadSound(hoverSounds[i]);
-            hoverSounds[i].frameCount = 0;
-        }
+    if (hoverSound.frameCount > 0) {
+        UnloadSound(hoverSound);
+        hoverSound.frameCount = 0;
     }
 
     if (bgmMenu.frameCount > 0) {

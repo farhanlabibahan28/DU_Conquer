@@ -27,6 +27,7 @@ int main() {
 
         if(state_of_game==LAYER_MENU) logic_draw_menu();
         else if(state_of_game==LAYER_MAP) logic_draw_map();
+        else if(state_of_game==LAYER_EXIT) break;
         
         
 
@@ -34,9 +35,10 @@ int main() {
         EndDrawing();
     }
 
+    unload_map();
+    unload_menu();
     CloseWindow();
 
-    // unload_map();
-    unload_menu();
+    
     return 0;
 }
